@@ -9,31 +9,44 @@
 //  - [English] http://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const {ccclass, property} = cc._decorator;
+import temPlaer from './Player'
+// let temPlayer = require('Player');
 
 @ccclass
 export default class NewClass extends cc.Component {
 
-    @property(cc.Node)
-    start_btn: cc.Node = null;
+
+
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {}
+    onLoad () {
+        this.inPutControl();
+    }
 
     start () {
-        this.LoginScale();
-        cc.director.preloadScene('Main')
-        this.start_btn.on('touchstart',()=>{
-            cc.director.loadScene('Main')
-        })
+        this.inPutControl();
     }
 
-    private LoginScale():void {  //欢迎界面的开始按钮动效
-        let scaleTo = cc.scaleTo(0.8,0.8);
-        let scalleRe = cc.scaleTo(0.8,1.0)
-        let seq = cc.sequence(scaleTo,scalleRe);
-        let repeat = cc.repeatForever(seq);
-        this.start_btn.runAction(repeat);
+
+    private inPutControl(){
+        cc.find('Canvas').on(cc.Node.EventType.TOUCH_START,this.touchBegan,this)
     }
 
-    // update (dt) {}
+    private touchBegan(){
+        let goAction = cc.moveBy(0.2,cc.v2(0,140));
+        this.node.runAction(goAction);
+    }
+    private noteBox(){
+        return this.node.getBoundingBoxToWorld();
+    }
+
+    update (dt) {
+        cc.director.preloadScene('Over')
+        let player = cc.find("Canvas/player").getComponent(temPlaer);
+        console.log()
+        if(cc.Intersection.rectRect(player.node.getBoundingBoxToWorld(),this.noteBox())){
+            cc.director.loadScene('Over')
+        }
+        // if(cc.intersectsRect()){}
+    }
 }
